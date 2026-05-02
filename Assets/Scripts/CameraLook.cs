@@ -1,37 +1,35 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
 public class CameraLook : MonoBehaviour
 {
-    public float sensibilidade = 200f;
+    public Camera playerCamera;
+    public float lookSpeed = 1f;
+    public float lookXLimit = 45f;
+    public float defaultHeight = 2f;
 
-    float rotacaoX = 0f;
-    float rotacaoY = 120f;
+    private float rotationX = 0;
 
-    public Transform playerBody;
-    public float rotacaoInicialY = 0f;
+    private bool canMove = true;
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-
-        rotacaoY = rotacaoInicialY;
-        playerBody.localRotation = Quaternion.Euler(0f, rotacaoY, 0f);
+        Cursor.visible = false;
     }
 
     void Update()
     {
-        float mouseX = Input.GetAxis("Mouse X") * sensibilidade * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * sensibilidade * Time.deltaTime;
 
-        // vertical (cima/baixo)
-        rotacaoX -= mouseY;
-        rotacaoX = Mathf.Clamp(rotacaoX, -30f, 30f);
-
-        // horizontal (esquerda/direita)
-        rotacaoY += mouseX;
-        rotacaoY = Mathf.Clamp(rotacaoY, 60f, 120f);
-
-        transform.localRotation = Quaternion.Euler(rotacaoX, 0f, 0f);
-        playerBody.localRotation = Quaternion.Euler(0f, rotacaoY, 0f);
+        if (canMove)
+        {
+            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+        }
     }
 }
+
